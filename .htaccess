@@ -1,0 +1,11 @@
+<IfModule mod_rewrite.c>
+    Options -MultiViews
+    RewriteEngine On
+
+    # chemin du project relatif a la racine du serveur
+    RewriteBase /hi-chat/
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ src/index.php [QSA,L]
+</IfModule>

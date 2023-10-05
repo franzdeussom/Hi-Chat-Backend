@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="ff24f8cf-0f48-4c69-ae7e-1e40c6020a8f" name="HiChat" url="http://localhost">
+        <fileTransfer mountedRoot="/opt/lampp/htdocs/hi-chat" accessType="MOUNT" port="0" />
+      </webServer>
+    </option>
+  </component>
+</project>
