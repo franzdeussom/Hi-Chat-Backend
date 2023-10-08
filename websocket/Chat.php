@@ -33,7 +33,7 @@ class Chat implements MessageComponentInterface{
 
     public function onOpen(ConnectionInterface $conn){
         $this->user->attach($conn);
-        //get param with the id_users
+        //get param with the user id
         $querystring =$conn->httpRequest->getUri()->getQuery();
         
         $this->addOnlineList($querystring, $conn);

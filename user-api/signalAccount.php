@@ -1,6 +1,9 @@
 <?php
     require('../connectDB.php');
     require('../header.php');
+    require('../TokenManager.php');
+    require('../autoload.php');
+    
     global $conn;
 
     $getRessource = file_get_contents('php://input');
@@ -12,25 +15,30 @@
         return;
     }
 
-    $query = $conn->prepare("INSERT INTO HiChat.ACCOUNT_SIGNALED(id_user_WMS, id_user_S) 
-                                    VALUES(:id_userWMS, :id_userS) 
-                            ");
-    $query->execute([
-        ':id_userWMS' => $data->id_user_WMS,
-        ':id_userS'=> $data->id_user_S
-    ]);
-
-    if($query){
-        $response = [
-            'sucess'=>true,
-            'done'=>true
-        ];
-        http_response_code(200);
-        echo json_encode($response);
-    }else{
-        http_response_code(500);
-        echo json_encode([]);
-    }
+   
     
+    if(verifiedToken($_SERVER['HTTP_AUTHORIZATION'])){
+        $query = $conn->prepare("INSERT INTO HiChat.ACCOUNT_SIGNALED(id_user_WMS, id_user_S) 
+                                            VALUES(:id_userWMS, :id_userS) 
+                                    ");
+            $query->execute([
+                ':id_userWMS' => $data->id_user_WMS,
+                ':id_userS'=> $data->id_user_S
+            ]);
+
+            if($query){
+                $response = [
+                    'sucess'=>true,
+                    'done'=>true
+                ];
+                http_response_code(200);
+                echo json_encode($response);
+            }else{
+                http_response_code(500);
+                echo json_encode([]);
+            }
+    }else{
+        http_response_code(403);
+    }
   
 ?>

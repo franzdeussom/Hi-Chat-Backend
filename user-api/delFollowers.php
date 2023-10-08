@@ -1,7 +1,9 @@
 <?php
     require('../connectDB.php');
     require('../header.php');
-
+    require('../TokenManager.php');
+    require('../autoload.php');
+    
     global $conn;
 
     $getData = file_get_contents('php://input');
@@ -13,24 +15,30 @@
         return;
     }
 
-    $query = $conn->prepare('DELETE FROM HiChat.FOLLOW 
-                             WHERE
-                                FOLLOW.id_users_WF = :id_users_WF
-                                AND
-                                FOLLOW.id_users_F = :id_users_F
-                            ');
-    $query->execute([
-        ':id_users_WF' => $data->id_WF,
-        ':id_users_F' => $data->id_F
-    ]);
+    if(verifiedToken($_SERVER['HTTP_AUTHORIZATION'])){
+            $query = $conn->prepare('DELETE FROM HiChat.FOLLOW 
+                                        WHERE
+                                            FOLLOW.id_users_WF = :id_users_WF
+                                            AND
+                                            FOLLOW.id_users_F = :id_users_F
+                                        ');
+                $query->execute([
+                    ':id_users_WF' => $data->id_WF,
+                    ':id_users_F' => $data->id_F
+                ]);
 
-    if($query){
-        $response = [
-            'success' => true,
-            'valid' => true
-        ];
-        echo json_encode($response);
+                if($query){
+                    $response = [
+                        'success' => true,
+                        'valid' => true
+                    ];
+                    echo json_encode($response);
+                }else{
+                    echo json_encode([]);
+                }
     }else{
-        echo json_encode([]);
+        http_response_code(403);
     }
+
+   
 ?>

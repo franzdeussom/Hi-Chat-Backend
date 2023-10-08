@@ -1,6 +1,8 @@
 <?php
     require('../connectDB.php');
     require('../header.php');
+    require('../TokenManager.php');
+    require('../autoload.php');
 
     global $conn;
 
@@ -13,7 +15,8 @@
         return;
     }
 
-    $query = $conn->prepare('INSERT INTO HiChat.FOLLOW( 
+    if(verifiedToken($_SERVER['HTTP_AUTHORIZATION'])){
+            $query = $conn->prepare('INSERT INTO HiChat.FOLLOW( 
                             id_users_WF,
                             id_users_F
                            ) 
@@ -21,18 +24,24 @@
                                 :id_users_WF,
                                 :id_users_F
                             )');
-    $query->execute([
-        ':id_users_WF' => $data->id_WF,
-        ':id_users_F' => $data->id_F
-    ]);
 
-    if($query){
-        $response = [
-            'success' => true,
-            'valid' => true
-        ];
-        echo json_encode($response);
+            $query->execute([
+                ':id_users_WF' => $data->id_WF,
+                ':id_users_F' => $data->id_F
+            ]);
+
+            if($query){
+                $response = [
+                    'success' => true,
+                    'valid' => true
+                ];
+                echo json_encode($response);
+            }else{
+                echo json_encode([]);
+            }
     }else{
-        echo json_encode([]);
+        http_response_code(403);
     }
+
+    
 ?>

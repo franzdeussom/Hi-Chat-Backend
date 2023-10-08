@@ -1,6 +1,8 @@
 <?php
     require('../connectDB.php');
     require('../header.php');
+    require('../TokenManager.php');
+    require('../autoload.php');
 
     global $conn;
 
@@ -12,30 +14,33 @@
     }else{
         return;
     }
-    if(isset($data->id_pub) && !empty($data->id_pub)){
-                $query = $conn->prepare('INSERT INTO HiChat.PUB_LIKE( 
-                            id_users,
-                            id_pub
-                           ) 
-                            VALUES(
-                                :id_users,
-                                :idPub
-                            )');
-                    $query->execute([
-                        ':id_users' => $data->id_users,
-                        ':idPub' => $data->id_pub
-                    ]);
 
-                    if($query){
-                        $response = [
-                            'success' => true,
-                            'valid' => true
-                        ];
-                        echo json_encode($response);
-                    }else{
-                        echo json_encode([]);
-                    }
-    }else{
+    if(verifiedToken($_SERVER['HTTP_AUTHORIZATION'])){
+
+            if(isset($data->id_pub) && !empty($data->id_pub)){
+                        $query = $conn->prepare('INSERT INTO HiChat.PUB_LIKE( 
+                                    id_users,
+                                    id_pub
+                                ) 
+                                    VALUES(
+                                        :id_users,
+                                        :idPub
+                                    )');
+                            $query->execute([
+                                ':id_users' => $data->id_users,
+                                ':idPub' => $data->id_pub
+                            ]);
+
+                            if($query){
+                                $response = [
+                                    'success' => true,
+                                    'valid' => true
+                                ];
+                                echo json_encode($response);
+                            }else{
+                                echo json_encode([]);
+                            }
+            }else{
                 $query = $conn->prepare('INSERT INTO HiChat.PUB_LIKE( 
                             id_users,
                             id_pub
@@ -58,6 +63,10 @@
                     }else{
                         echo json_encode([]);
                     }
+            }
+    
+    }else{
+        http_response_code(403);
     }
     
 ?>

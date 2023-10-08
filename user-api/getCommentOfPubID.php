@@ -1,6 +1,8 @@
 <?php
     require('../connectDB.php');
     require('../header.php');
+    require('../TokenManager.php');
+    require('../autoload.php');
 
     global $conn;
 
@@ -12,6 +14,13 @@
     }else{
         return;
     }
+
+    if(verifiedToken($_SERVER['HTTP_AUTHORIZATION'])){
+
+    }else{
+        http_response_code(403);
+    }
+
     if(empty($data->id_pub) && !isset($data->id_pub)){
             $query = $conn->prepare("SELECT DISTINCT
                                                 COMMENTAIRE.id_commentaire, 

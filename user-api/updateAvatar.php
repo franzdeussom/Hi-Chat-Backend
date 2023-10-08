@@ -2,6 +2,8 @@
     require('../connectDB.php');
     require('../header.php');
     require('../file.service/saveFile.class.php');
+    require('../TokenManager.php');
+    require('../autoload.php');
 
     global $conn;
 
@@ -13,56 +15,62 @@
     }else{
         return;
     }
-    if($data->isBase64File){
-        //base64 user image
-         $saveFile = new SaveFile($data->profilImgUrl, $data->id_users, Standard::PUBLICATION_IMAGE->value);
-        $fileToDecode = $saveFile->decodeFile();
-       
-      if($saveFile->moveFileAvatar($fileToDecode)){
-        if($data->isUrlPresent){
-            $saveFile->deleteOldProfile($data->imgUrl);
-        }
-            $query = $conn->prepare('UPDATE HiChat.USERS 
-                             SET USERS.profilImgUrl = :img
-                            WHERE USERS.id_users = :idUser
-                            ');
-            $query->execute([
-                ':img' => $saveFile->getFileFullPath(),
-                ':idUser'=> $data->id_users
-            ]);
+    
 
-            if($query){
-                $response = [
-                    'success' => true,
-                    'valid' => true,
-                    'imgUrl'=> $saveFile->getFileFullPath()
-                ];
-                echo json_encode($response);
-            }else{
-                echo json_encode([]);
+    if(verifiedToken($_SERVER['HTTP_AUTHORIZATION'])){
+        if($data->isBase64File){
+                //base64 user image
+                $saveFile = new SaveFile($data->profilImgUrl, $data->id_users, Standard::PUBLICATION_IMAGE->value);
+                $fileToDecode = $saveFile->decodeFile();
+            
+            if($saveFile->moveFileAvatar($fileToDecode)){
+                if($data->isUrlPresent){
+                    $saveFile->deleteOldProfile($data->imgUrl);
+                }
+                    $query = $conn->prepare('UPDATE HiChat.USERS 
+                                    SET USERS.profilImgUrl = :img
+                                    WHERE USERS.id_users = :idUser
+                                    ');
+                    $query->execute([
+                        ':img' => $saveFile->getFileFullPath(),
+                        ':idUser'=> $data->id_users
+                    ]);
+
+                    if($query){
+                        $response = [
+                            'success' => true,
+                            'valid' => true,
+                            'imgUrl'=> $saveFile->getFileFullPath()
+                        ];
+                        echo json_encode($response);
+                    }else{
+                        echo json_encode([]);
+                    }
             }
-      }
-        
-    }else{
-        //avatar from app
-            $query = $conn->prepare('UPDATE HiChat.USERS 
-                             SET USERS.profilImgUrl = :img
-                            WHERE USERS.id_users = :idUser
-                            ');
-            $query->execute([
-                ':img' => $data->profilImgUrl,
-                ':idUser'=> $data->id_users
-            ]);
+                
+            }else{
+                //avatar from app
+                    $query = $conn->prepare('UPDATE HiChat.USERS 
+                                    SET USERS.profilImgUrl = :img
+                                    WHERE USERS.id_users = :idUser
+                                    ');
+                    $query->execute([
+                        ':img' => $data->profilImgUrl,
+                        ':idUser'=> $data->id_users
+                    ]);
 
-        if($query){
-            $response = [
-                'success' => true,
-                'valid' => true
-            ];
-            echo json_encode($response);
-        }else{
-            echo json_encode([]);
-        }
+                if($query){
+                    $response = [
+                        'success' => true,
+                        'valid' => true
+                    ];
+                    echo json_encode($response);
+                }else{
+                    echo json_encode([]);
+                }
+            }
+    }else{
+        http_response_code(403);
     }
     
 ?>

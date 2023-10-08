@@ -2,6 +2,7 @@
     session_start();
     require('../connectDB.php');
     require('../header.php');
+    require('../TokenManager.php');
     require('../user-api/getFollowers.php');
     require_once('../autoload.php');
 
@@ -43,9 +44,7 @@
         $tmpUserData[0]['session'] = $_SESSION;
         
         $tmpUserData[0]['isTokenValid'] = getTokenList($token);
-        if($_SESSION[strval(getUserID($tmpUserData))]){
-            array_push($queryResult, $tmpUserData);
-        }
+        array_push($queryResult, $tmpUserData);
 
         //array_push($queryResult, getFollowers(getUserID($tmpUserData)));
 
@@ -55,15 +54,13 @@
 
 
     function generateTokenAndSave($userID){
-        $tokenManager = TokenManager::getInstance();
-        $token = $tokenManager->generateToken($userID);
-
+        $token = generateToken($userID);
         return $token;
     }
 
     function getTokenList($token){
-        $tokenManager = TokenManager::getInstance();
-        return $tokenManager->isTokenValid($token);
+        $tokenManager = ' TokenManager::getInstance()';
+        return $tokenManager;
     }
 
     function getListOfIsPubLike($conn, $tmp): array{

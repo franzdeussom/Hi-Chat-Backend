@@ -1,6 +1,47 @@
 <?php
+    require_once 'vendor/autoload.php';
+    use Firebase\JWT\JWT;
+    use Firebase\JWT\Key;
+    
+    $algo = 'HS256';
+    $myKey = 'HI-Chat-FranzDeussom2023';
 
-    class TokenManager{
+    function generateToken($userID){
+        global $algo;
+        global $myKey;
+
+        $payload = [
+            'sub' => strval($userID),
+            'name' => 'Franz Deussom2023',
+            'iat' => time(),
+            'exp' => time() + (60 * 60), // Expires in 1 hour
+        ];
+
+        $token = JWT::encode($payload, $myKey, $algo);
+        return $token;
+    }
+    
+    function verifiedToken($authorization){
+        global $algo;
+        global $myKey;
+
+        if(is_null($authorization)){
+            $authorization = 'FranzDeussom';
+        }
+        
+        try{
+            $decoded = JWT::decode($authorization, new Key($myKey, $algo));
+            return true;
+            
+        }catch(Exception $e){
+            http_response_code(403);
+            return false;
+        }
+    }
+
+
+    
+    /*class TokenManager{
         private $tokensList;
         private static $instance = null;
         private $secretKey = 'HiChat-Franz2003';
@@ -51,4 +92,4 @@
         }
     }
 
-?>
+?>*/

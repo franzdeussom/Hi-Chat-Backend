@@ -1,6 +1,8 @@
 <?php
     require('../connectDB.php');
     require('../header.php');
+    require('../TokenManager.php');
+    require('../autoload.php');
 
     global $conn;
 
@@ -13,24 +15,30 @@
         return;
     }
 
-    $query = $conn->prepare('DELETE FROM HiChat.PUB_LIKE 
-                             WHERE
-                                PUB_LIKE.id_pub = :id_pub
-                                AND
-                                PUB_LIKE.id_users = :id_users
-                            ');
-    $query->execute([
-        ':id_pub' => $data->id_pub,
-        ':id_users' => $data->id_users
-    ]);
+    
+    if(verifiedToken($_SERVER['HTTP_AUTHORIZATION'])){
+        $query = $conn->prepare('DELETE FROM HiChat.PUB_LIKE 
+                                    WHERE
+                                        PUB_LIKE.id_pub = :id_pub
+                                        AND
+                                        PUB_LIKE.id_users = :id_users
+                                    ');
+            $query->execute([
+                ':id_pub' => $data->id_pub,
+                ':id_users' => $data->id_users
+            ]);
 
-    if($query){
-        $response = [
-            'success' => true,
-            'valid' => true
-        ];
-        echo json_encode($response);
+            if($query){
+                $response = [
+                    'success' => true,
+                    'valid' => true
+                ];
+                echo json_encode($response);
+            }else{
+                echo json_encode([]);
+            }
+
     }else{
-        echo json_encode([]);
+        http_response_code(403);
     }
 ?>

@@ -1,6 +1,8 @@
 <?php
     require('../connectDB.php');
     require('../header.php');
+    require('../TokenManager.php');
+    require('../autoload.php');
 
     global $conn;
 
@@ -12,23 +14,29 @@
     }else{
         return;
     }
-    $query = $conn->prepare('UPDATE HiChat.PUBLICATION
-                            SET PUBLICATION.libelle = :newValue
-                            WHERE 
-                                PUBLICATION.id_pub = :id_pub
-                            ');
-    $query->execute([
-        ':newValue' => $data->newValue,
-        ':id_pub' => $data->id_pub
-    ]);
     
-    if($query){
-        $response = [
-            'success' => true,
-            'valid' => true,
-        ];
-        echo json_encode($response);
+    if(verifiedToken($_SERVER['HTTP_AUTHORIZATION'])){
+    $query = $conn->prepare('UPDATE HiChat.PUBLICATION
+                                SET PUBLICATION.libelle = :newValue
+                                WHERE 
+                                    PUBLICATION.id_pub = :id_pub
+                                ');
+        $query->execute([
+            ':newValue' => $data->newValue,
+            ':id_pub' => $data->id_pub
+        ]);
+        
+        if($query){
+            $response = [
+                'success' => true,
+                'valid' => true,
+            ];
+            echo json_encode($response);
+        }else{
+            echo json_encode([]);
+        }
+
     }else{
-        echo json_encode([]);
+        http_response_code(403);
     }
 ?>

@@ -1,6 +1,8 @@
 <?php
     require('../connectDB.php');
     require('../header.php');
+    require('../TokenManager.php');
+    require('../autoload.php');
 
     global $conn;
 
@@ -11,6 +13,12 @@
         http_response_code(200);
     }else{
         return;
+    }
+
+    if(verifiedToken($_SERVER['HTTP_AUTHORIZATION'])){
+
+    }else{
+        http_response_code(403);
     }
 
     $query = $conn->prepare("SELECT DISTINCT 

@@ -1,6 +1,8 @@
 <?php
     require('../connectDB.php');
     require('../header.php');
+    require('../TokenManager.php');
+    require('../autoload.php');
 
     global $conn;
 
@@ -13,42 +15,48 @@
         return;
     }
 
+    if(verifiedToken($_SERVER['HTTP_AUTHORIZATION'])){
         if(!isset($data->PID) && empty($data->PID)){
-            $query = $conn->prepare("DELETE FROM HiChat.PUBLICATION 
-                                        WHERE
-                                        PUBLICATION.id_pub = :id
-                                    ");
-             $query->execute([':id'=> $data->id_pub]);
+                    $query = $conn->prepare("DELETE FROM HiChat.PUBLICATION 
+                                                WHERE
+                                                PUBLICATION.id_pub = :id
+                                            ");
+                    $query->execute([':id'=> $data->id_pub]);
 
 
-            if($query){
-                $response = [
-                    'success' => true,
-                    'valid' => true
-                ];
-                echo json_encode($response);
-            }else{
-                echo json_encode([]);
+                    if($query){
+                        $response = [
+                            'success' => true,
+                            'valid' => true
+                        ];
+                        echo json_encode($response);
+                    }else{
+                        echo json_encode([]);
+                    }
+                }else{
+                        $query = $conn->prepare("DELETE FROM HiChat.PUBLICATION 
+                                                WHERE
+                                                PUBLICATION.PID = :id
+                                            ");
+                    $query->execute([':id'=> $data->PID]);
+
+
+                    if($query){
+                        $response = [
+                            'success' => true,
+                            'valid_PID' => true
+                        ];
+                        echo json_encode($response);
+                    }else{
+                        echo json_encode([]);
+                }
             }
-        }else{
-                $query = $conn->prepare("DELETE FROM HiChat.PUBLICATION 
-                                        WHERE
-                                        PUBLICATION.PID = :id
-                                    ");
-             $query->execute([':id'=> $data->PID]);
-
-
-            if($query){
-                $response = [
-                    'success' => true,
-                    'valid_PID' => true
-                ];
-                echo json_encode($response);
-            }else{
-                echo json_encode([]);
-        }
+                        
+            
+    }else{
+        http_response_code(403);
     }
-                
+
       
 
     

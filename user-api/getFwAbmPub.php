@@ -5,6 +5,8 @@
     require('../header.php');
     require('../user-api/getFollowers.php');
     require('../user-api/getAbm.php');
+    require('../TokenManager.php');
+    require('../autoload.php');
 
     $dataUser = file_get_contents('php://input');
 
@@ -14,6 +16,13 @@
     }else{
         return;
     }
+
+    if(verifiedToken($_SERVER['HTTP_AUTHORIZATION'])){
+
+    }else{
+        http_response_code(403);
+    }
+
     $id_F = $data->id_users;
 
     $globalArray = Array();
