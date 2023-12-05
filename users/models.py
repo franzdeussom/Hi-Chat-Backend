@@ -1,13 +1,13 @@
-import time
+import uuid
 
-from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.models import BaseUserManager
+from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.core.validators import RegexValidator
 from django.db import models
-from django.utils.text import gettext_lazy as _
+from django.utils.translation import gettext as _
 
 
 def user_profile_upload_location(instance: AbstractUser, filename: str):
-    return f"{instance.id}/profiles/{time.time()}{filename[filename.rfind('.'):]}"
+    return f"{instance.id}/profiles/{uuid.uuid4().hex}{filename[filename.rfind('.'):]}"
 
 
 class UserManager(BaseUserManager):
@@ -38,12 +38,13 @@ class User(AbstractUser):
         PENDING = "PENDING", _("en cours de verification")
         PREMIUM = "PREMIUM", _("premium")
 
-    username = False
+    username = None
     email = models.EmailField("email", max_length=255, unique=True)
-    # password est deja défini par défaut
+    # password is
     age = models.IntegerField()
     gender = models.CharField("sexe", max_length=1, choices=Gender.choices, null=True)
-    phone = models.CharField("telephone", max_length=20, null=True)
+    phone = models.CharField("telephone", max_length=20, null=True,
+                             validators=[RegexValidator(r"^\+?[0-9]{7,}$", "Incorrect Phone number")])
     birthday = models.DateField("anniversaire", null=True)
     country = models.CharField("pays", max_length=255, null=True)
     city = models.CharField("ville", max_length=255, null=True)
@@ -57,8 +58,3 @@ class User(AbstractUser):
     REQUIRED_FIELDS = ['first_name', 'last_name', 'age']
 
     objects = UserManager()
-
-    def save(self, *args, **kwargs):
-        self.set_password(self.password)
-        # TODO check if password is not encrypted at every save
-        return super().save(*args, **kwargs)

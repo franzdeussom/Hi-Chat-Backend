@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-y+2=wgj49w$wg+hh4+@c!+!d_f4yv#q$%xtcm6c%xb+yfk4l)@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -129,3 +129,5 @@ AUTH_USER_MODEL = 'users.User'
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
 }
+
+CORS_ORIGIN_ALLOW_ALL = True
