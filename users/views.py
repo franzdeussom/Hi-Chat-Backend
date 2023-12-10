@@ -2,9 +2,9 @@ from rest_framework import status, exceptions
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
 
 from hichat.permissions import IsOwnerOrReadOnly
-from hichat.viewsets import HichatModelViewSet
 from publications.models import Publication
 from publications.serializers import PublicationSerializer
 from .mixins import UserSearchMixin
@@ -12,10 +12,15 @@ from .models import User
 from .serializers import UserDetailSerializer, UserListSerializer
 
 
-class UserViewSet(UserSearchMixin, HichatModelViewSet):
+class UserViewSet(UserSearchMixin, ModelViewSet):
     serializer_class = UserDetailSerializer
     list_serializer_class = UserListSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return self.list_serializer_class or super().get_serializer_class()
+        return super().get_serializer_class()
 
     def get_queryset(self):
         return User.objects.all()

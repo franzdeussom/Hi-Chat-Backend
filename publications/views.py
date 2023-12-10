@@ -1,14 +1,14 @@
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.viewsets import ModelViewSet
 from rest_framework_nested.viewsets import NestedViewSetMixin
 
 from hichat.permissions import IsOwnerOrReadOnly
-from hichat.viewsets import HichatModelViewSet
 from .mixins import LikeViewSetMixin
 from .models import Publication, Comment
 from .serializers import PublicationSerializer, CommentSerializer
 
 
-class PublicationViewSet(LikeViewSetMixin, HichatModelViewSet):
+class PublicationViewSet(LikeViewSetMixin, ModelViewSet):
     serializer_class = PublicationSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
@@ -23,7 +23,7 @@ class PublicationViewSet(LikeViewSetMixin, HichatModelViewSet):
         serializer.save(owner=self.request.user)
 
 
-class CommentViewSet(NestedViewSetMixin, LikeViewSetMixin, HichatModelViewSet):
+class CommentViewSet(NestedViewSetMixin, LikeViewSetMixin, ModelViewSet):
     serializer_class = CommentSerializer
     queryset = Comment.objects.all()
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
