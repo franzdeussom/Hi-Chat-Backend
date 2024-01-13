@@ -3,6 +3,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework_nested import routers
+from rest_framework_simplejwt.views import TokenRefreshView, TokenObtainPairView
 
 from chat.views import MessageViewSet
 from publications.views import PublicationViewSet, CommentViewSet
@@ -21,6 +22,8 @@ publications_comments_router.register('comments', CommentViewSet, basename='post
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/', include(router.urls + users_chat_router.urls + publications_comments_router.urls))
 ]
 
